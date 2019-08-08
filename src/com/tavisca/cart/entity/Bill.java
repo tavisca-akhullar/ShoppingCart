@@ -1,36 +1,39 @@
 package com.tavisca.cart.entity;
 
+import com.tavisca.cart.factory.DiscountFactory;
+
 import java.util.*;
 
 public class Bill {
-    private double discountedPercentage;
     private Cart cart;
-    private List<CartItem> cartItemList;
-
-    public Bill(Cart cart)
+    private IDiscount discount;
+    public Bill(Cart cart,String discount) throws Exception
     {
         this.cart=cart;
-        discountedPercentage=0.0;
-        cartItemList=this.cart.getCartItems();
+        this.discount= DiscountFactory.getDiscount(discount);
     }
 
-    public double getDiscountedPercentage() {
-        return discountedPercentage;
-    }
-
-    public void setDiscountedPercentage(double discountedPercentage) {
-        this.discountedPercentage = discountedPercentage;
-    }
 
     public double discountedAmount()
     {
-        double totalPrice=cart.totalPrice();
-        return totalPrice*(discountedPercentage/100);
+      return discount.getDiscount(cart);
     }
+
 
     public double payableAmount()
     {
-        double totalPrice=cart.totalPrice();
-        return  totalPrice-this.discountedAmount();
+       return totalAmount()-discountedAmount();
+    }
+
+
+    public double totalAmount()
+    {
+        double total=0.0;
+        HashMap<Product,Double> cartItems=cart.getCartItems();
+        for (Product product:cartItems.keySet())
+        {
+            total+=(product.getPrice()*cartItems.get(product));
+        }
+        return total;
     }
 }

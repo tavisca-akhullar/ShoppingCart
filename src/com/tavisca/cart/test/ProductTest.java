@@ -1,76 +1,60 @@
 package com.tavisca.cart.test;
-
-
-import com.tavisca.cart.entity.Bill;
-import com.tavisca.cart.entity.Cart;
-import com.tavisca.cart.entity.CartItem;
-import com.tavisca.cart.entity.Product;
+import com.tavisca.cart.entity.*;
 import org.junit.*;
 import org.junit.Test;
 
 
 public class ProductTest {
-    Product product;
-    CartItem cartItem;
-    Cart cart;
-     Bill bill;
+    static Product mobile;
+    static ShoppingItem shoppingItems;
+    static Bill bill;
+    static Product pen;
     @BeforeClass
     public static void initialization()
     {
-
+        pen=new Product("pen",10,Category.Stationary);
+        mobile=new Product("mobile",10000,Category.ELectronics);
+         shoppingItems=new ShoppingItem();
 
     }
 
     @AfterClass
-    public static void cleanUp(){}
+    public static void cleanUp()
+    {
+    mobile=null;
+    shoppingItems=null;
+    bill=null;
+    pen=null;
+    }
 
     @Test
-    public void AddProductToCart()
+    public void Add_Product_For_Shopping()
     {
-        product =new Product("soap",50);
-        cartItem=new CartItem(product,4);
-        cart=new Cart();
-        cart.AddProduct(cartItem);
-        for (CartItem value:cart.getCartItems()) {
-            Assert.assertEquals("soap",product.getName());
+        try {
+               shoppingItems.addShoppingItem(mobile,100);
+                for (Product product:shoppingItems.getShoppingItems().keySet())
+                {
+                Assert.assertEquals("mobile",product.getName());
+                }
+            } catch (ItemNotFoundException e) {
+            e.printStackTrace();
         }
-     }
-
-     @Test
-    public void GetTotal()
-     {
-         product =new Product("soap",50);
-         cartItem=new CartItem(product,4);
-         cart=new Cart();
-         cart.AddProduct(cartItem);
-         double total= cart.totalPrice();
-         Assert.assertEquals(Double.toString(200.0),Double.toString(total));
-     }
-
-     @Test
-    public void GetDiscountedValue()
-     {
-         product =new Product("soap",50);
-         cartItem=new CartItem(product,4);
-         Cart cart=new Cart();
-         cart.AddProduct(cartItem);
-         Bill bill=new Bill(cart);
-        bill.setDiscountedPercentage(20);
-         Assert.assertEquals(Double.toString(40.0),Double.toString(bill.discountedAmount()));
-
-     }
+    }
 
     @Test
-    public void GetPayableValue()
+    public void Remove_Product_For_Shopping()
     {
-        product =new Product("soap",50);
-        cartItem=new CartItem(product,4);
-        cart=new Cart();
-        cart.AddProduct(cartItem);
-        bill=new Bill(cart);
-        bill.setDiscountedPercentage(20);
-        Assert.assertEquals(Double.toString(160.0),Double.toString(bill.payableAmount()));
-
+        try {
+            shoppingItems.addShoppingItem(mobile,100);
+            shoppingItems.addShoppingItem(pen,10000);
+            shoppingItems.removeShoppingItem(mobile,100);
+            for (Product product:shoppingItems.getShoppingItems().keySet())
+            {
+                Assert.assertEquals("pen",product.getName());
+            }
+        } catch (ItemNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 }

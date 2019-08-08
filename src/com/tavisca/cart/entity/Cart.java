@@ -1,33 +1,56 @@
 package com.tavisca.cart.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class Cart {
-    private  List<CartItem> cartItems;
-       public Cart()
+    private ShoppingItem shoppingItem;
+    private HashMap<Product,Double> cartItems;
+       public Cart(ShoppingItem shoppingItem)
         {
-            cartItems=new ArrayList<>();
+            this.shoppingItem=shoppingItem;
+            cartItems=new HashMap<Product,Double>();
         }
 
-    public List<CartItem> getCartItems()
+    public HashMap<Product,Double> getCartItems()
     {
         return cartItems;
     }
 
-    public void AddProduct(CartItem item)
+    public void addProduct(Product product, double quantity) throws Exception
         {
-            cartItems.add(item);
+            HashMap<Product,Double> items=shoppingItem.getShoppingItems();
+            if(quantity>0)
+               if(items.containsKey(product))
+               {
+                   cartItems.put(product,quantity);
+                   shoppingItem.removeShoppingItem(product,quantity);
+               }
+            else
+                {
+                    throw  new ItemNotFoundException("Item Not Found..");
+                }
+            else
+                {
+                throw  new InsufficientQuantityException("Insufficient Quantity");
+                }
         }
 
-     public double totalPrice()
-        {
-            double total=0.0;
-            for(CartItem item:cartItems)
+    public void removeProduct(Product product, double quantity) throws  Exception
+    {
+        HashMap<Product,Double> items=shoppingItem.getShoppingItems();
+        if(quantity>0 && quantity<cartItems.get(product) )
+            if(items.containsKey(product))
             {
-                total+=item.getTotalCount();
+                cartItems.put(product,cartItems.get(product)-quantity);
+                shoppingItem.addShoppingItem(product,quantity);
             }
-            return  total;
-        }
-
+            else
+            {
+                throw  new ItemNotFoundException("Item Not Found..");
+            }
+            else
+                {
+                    throw  new InsufficientQuantityException("Insufficient Quantity");
+                }
+    }
 }
